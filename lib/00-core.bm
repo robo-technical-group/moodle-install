@@ -1,5 +1,6 @@
 # Additional global variables
 cwd="$(pwd)"
+db_create_user=0
 iomad_dir="${web_dir}/iomad"
 moodle_tarball="${moodle_src_dir}/moodle.tgz"
 
@@ -7,6 +8,7 @@ function print_vars() {
     echo ""
     echo "Configuration variables:"
     local vars="DEBUG bin_path cwd iomad_branch libdir moodle_src_dir moodle_type moodle_ver xdir"
+    local v
     for v in $vars ;
     do
         echo "  $v = ${!v}"
@@ -34,6 +36,7 @@ function print_verbose() {
 
 function test_bins() {
     local retval=0
+    local x
     for x in $1 ;
     do
         if [ -z "${!x}" -o ! -x "${!x}" ]
