@@ -1,0 +1,46 @@
+# Additional global variables
+cwd="$(pwd)"
+iomad_dir="${web_dir}/iomad"
+moodle_tarball="${moodle_src_dir}/moodle.tgz"
+
+function print_vars() {
+    echo ""
+    echo "Configuration variables:"
+    local vars="DEBUG bin_path cwd iomad_branch libdir moodle_src_dir moodle_type moodle_ver xdir"
+    for v in $vars ;
+    do
+        echo "  $v = ${!v}"
+    done
+
+    # Arrays
+    echo ""
+    echo "  moodle_full_version = ${moodle_full_version[@]}"
+
+    echo ""
+    echo "Binaries:"
+    local vars="git wget"
+    for v in $vars ;
+    do
+        echo "  $v = ${!v}"
+    done
+}
+
+function print_verbose() {
+    if [ $DEBUG -eq 1 ]
+    then
+        echo $@
+    fi
+}
+
+function test_bins() {
+    local retval=0
+    for x in $1 ;
+    do
+        if [ -z "${!x}" -o ! -x "${!x}" ]
+        then
+            echo "Cannot find executable ${x}."
+            retval=1
+        fi
+    done
+    return $retval
+}

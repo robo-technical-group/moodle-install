@@ -1,0 +1,134 @@
+function extract_moodle_src() {
+    if [ ! -d "$web_dir" ]
+    then
+        mkdir -p "$web_dir"
+        retval=$?
+    fi
+
+    if [ ! -d "$web_dir" ]
+    then
+        return $retval
+    fi
+
+    cd "$web_dir"
+    if [ ! -d "$moodle_version_string" ]
+    then
+        if [ -d "moodle" ]
+        then
+            print_verbose "Deleting existing moodle directory at $web_dir"
+            rm -rf moodle
+        fi
+        if [ -d "moodle" ]
+        then
+            echo "Could not delete moodle directory at ${web_dir}; aborting."
+            return 1
+        fi
+        print_verbose "Extracting Moodle PHP files."
+        tar xfz "$moodle_tarball"
+        mv moodle "$moodle_version_string"
+    else
+        print_verbose "Moodle PHP files already extracted."
+    fi
+    if [ -e current ]
+    then
+        rm current
+    fi
+    ln -s $moodle_version_string current
+}
+
+function get_iomad_src() {
+    test_bins "git"
+    local retval=$?
+    if [ $retval -gt 0 ]
+    then
+        return $retval
+    fi
+
+    if [ ! -d "$web_dir" ]
+    then
+        mkdir -p "$web_dir"
+        retval=$?
+    fi
+
+    if [ ! -d "$web_dir" ]
+    then
+        return $retval
+    fi
+    
+    if [ ! -d "$iomad_dir" ]
+    then
+        local uri="https://github.com/iomad/iomad.git"
+        print_verbose "Cloning repository at $uri to $web_dir"
+        cd "$web_dir"
+        git clone $uri
+        cd iomad
+        git checkout -b myiomad origin/$iomad_branch
+    else
+        cd "$iomad_dir"
+        git config pull.rebase true
+        git checkout -b myiomad origin/$iomad_branch
+        git pull
+    fi
+}
+
+function get_moodle_src() {
+    test_bins "wget"
+    local retval=$?
+    if [ $retval -gt 0 ]
+    then
+        return $retval
+    fi
+
+    if [ ! -d "$moodle_src_dir" ]
+    then
+        mkdir -p "$moodle_src_dir"
+        retval=$?
+    fi
+
+    if [ ! -d "$moodle_src_dir" ]
+    then
+        return $retval
+    fi
+
+    # Only download tarball if a current one does not exist.
+    local uri="https://download.moodle.org/download.php/direct/stable${moodle_full_version[0]}${moodle_full_version[1]}/moodle-latest-${moodle_full_version[0]}${moodle_full_version[1]}.tgz"
+    if [ ! -e $moodle_tarball ]
+    then
+        print_verbose "Downloading $uri to $moodle_src_dir"
+        wget -O "$moodle_tarball" $uri
+    fi
+    cd $moodle_src_dir
+    tar xfz moodle.tgz moodle/version.php
+    rev=$(grep "^\$version" moodle/version.php | sed -n "s/^\$version[[:blank:]]*=[[:blank:]]*[[:digit:]]\{8\}\(.*\);.*/\1/p")
+    moodle_full_version[2]=${rev%%.*}
+    moodle_full_version[3]=${rev#*.}
+    rm -rf moodle
+
+    printf -v moodle_version_string '%s.' "${moodle_full_version[@]}"
+    moodle_version_string=${moodle_version_string%.}
+    print_verbose "Moodle version downloaded: $moodle_version_string"
+
+    local new_moodle_file=moodle-${moodle_version_string}.tgz
+    if [ ! -e $new_moodle_file ]
+    then
+        mv moodle.tgz $new_moodle_file
+    else
+        rm moodle.tgz
+    fi
+    moodle_tarball=${moodle_src_dir}/${new_moodle_file}
+}
+
+function split_version_string() {
+    moodle_full_version=()
+    local ver_string="${moodle_ver}."
+    while [[ $ver_string ]];
+    do
+        moodle_full_version+=( "${ver_string%%.*}" )
+        ver_string=${ver_string#*.}
+    done
+
+    if [ ${moodle_full_version[0]} -ge 4 ]
+    then
+        moodle_full_version[1]="0${moodle_full_version[1]}"
+    fi
+}
