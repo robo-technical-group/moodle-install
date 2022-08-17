@@ -10,24 +10,24 @@ function create_db() {
         if [ "$db_host" == "localhost" ]
         then
             install_mariadb
+            create_db_mysql
         fi
-        create_db_mysql
         ;;
 
     mysql)
         if [ "$db_host" == "localhost" ]
         then
             install_mysql
+            create_db_mysql
         fi
-        create_db_mysql
         ;;
 
     postgres|psql)
         if [ "$db_host" == "localhost" ]
         then
             install_postgres
+            create_db_postgres
         fi
-        create_db_postgres
         ;;
     esac
 }

@@ -55,3 +55,7 @@ then
     cd "$cwd"
     exit $retval
 fi
+
+# Will only run when database server is localhost
+create_db
+
