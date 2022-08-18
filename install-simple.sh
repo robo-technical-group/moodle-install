@@ -67,3 +67,4 @@ fi
 # Will only run when database server is localhost
 create_db
 
+install_apache
