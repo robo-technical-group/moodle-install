@@ -68,3 +68,4 @@ fi
 create_db
 
 install_apache
+install_php
