@@ -3,6 +3,44 @@ cwd="$(pwd)"
 iomad_dir="${web_dir}/iomad"
 moodle_tarball="${moodle_src_dir}/moodle.tgz"
 
+function create_data_directories() {
+    local retval=0
+    for d in $moodle_files_dir $moodle_src_dir $web_dir ;
+    do
+        if [ ! -d "$d" ]
+        then
+            sudo mkdir -p "$d"
+        fi
+
+        if [ ! -d "$d" ]
+        then
+            echo "Could not create directory $d"
+            retval=1
+        fi
+
+        sudo chgrp adm "$d"
+        sudo chmod g+ws "$d"
+    done
+
+    return $retval
+}
+
+function prep_debian() {
+    echo "Installing software updates."
+    sudo apt-get update
+    sudo apt-get dist-upgrade
+
+    # Check for `moodle` group
+    getent group moodle > /dev/null
+    local retval=$?
+
+    if [ $retval -gt 0 ]
+    then
+        echo "Creating Moodle user group."
+        sudo addgroup moodle
+    fi
+}
+
 function print_vars() {
     echo ""
     echo "Configuration variables:"

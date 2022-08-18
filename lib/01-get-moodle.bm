@@ -1,15 +1,4 @@
 function extract_moodle_src() {
-    if [ ! -d "$web_dir" ]
-    then
-        mkdir -p "$web_dir"
-        retval=$?
-    fi
-
-    if [ ! -d "$web_dir" ]
-    then
-        return $retval
-    fi
-
     cd "$web_dir"
     if [ ! -d "$moodle_version_string" ]
     then
@@ -44,17 +33,6 @@ function get_iomad_src() {
         return $retval
     fi
 
-    if [ ! -d "$web_dir" ]
-    then
-        mkdir -p "$web_dir"
-        retval=$?
-    fi
-
-    if [ ! -d "$web_dir" ]
-    then
-        return $retval
-    fi
-    
     if [ ! -d "$iomad_dir" ]
     then
         local uri="https://github.com/iomad/iomad.git"
@@ -75,17 +53,6 @@ function get_moodle_src() {
     test_bins "wget"
     local retval=$?
     if [ $retval -gt 0 ]
-    then
-        return $retval
-    fi
-
-    if [ ! -d "$moodle_src_dir" ]
-    then
-        mkdir -p "$moodle_src_dir"
-        retval=$?
-    fi
-
-    if [ ! -d "$moodle_src_dir" ]
     then
         return $retval
     fi

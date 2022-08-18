@@ -37,6 +37,14 @@ then
 fi
 
 retval=0
+prep_debian
+create_data_directories
+retval=$?
+if [ $retval -gt 0 ]
+then
+    exit $retval
+fi
+
 if [ $moodle_type == "moodle" ]
 then
     get_moodle_src
