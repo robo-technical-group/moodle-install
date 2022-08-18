@@ -1,6 +1,5 @@
 # Additional global variables
 cwd="$(pwd)"
-db_create_user=0
 iomad_dir="${web_dir}/iomad"
 moodle_tarball="${moodle_src_dir}/moodle.tgz"
 

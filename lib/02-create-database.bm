@@ -1,8 +1,13 @@
 function create_db() {
+    local db_bin="null"
+    local db_bin_query="null"
+    local db_prefix="null"
+    local db_update_password=0
+
     if [ -z "$db_pass" ]
     then
         db_pass=$(cat /dev/urandom | tr -dc '[A-Za-z0-9!#%&()+,.:;<=>@|]' | fold -w ${1:-20} | head -n 1)
-        db_create_user=1
+        db_update_password=1
     fi
 
     case "$db_type" in
@@ -10,7 +15,9 @@ function create_db() {
         if [ "$db_host" == "localhost" ]
         then
             install_mariadb
-            create_db_mysql
+            db_bin="sudo mariadb"
+            db_bin_query="$db_bin --skip-column-names"
+            db_prefix="mysql"
         fi
         ;;
 
@@ -18,7 +25,9 @@ function create_db() {
         if [ "$db_host" == "localhost" ]
         then
             install_mysql
-            create_db_mysql
+            db_bin="sudo mysql"
+            db_bin_query="$db_bin --skip-column-names"
+            db_prefix="mysql"
         fi
         ;;
 
@@ -26,33 +35,27 @@ function create_db() {
         if [ "$db_host" == "localhost" ]
         then
             install_postgres
-            create_db_postgres
+            db_bin="sudo sudo -u postgres psql"
+            db_bin_query="$db_bin --tuples-only --no-align"
+            db_prefix="psql"
         fi
         ;;
     esac
-}
 
-function create_db_mariadb() {
-    create_db_mysql
-}
-
-function create_db_mysql() {
     local sql="/tmp/user.sql"
+
     # Test for existing user
-    if [ $db_create_user -eq 0 ]
+    sed -e "s/%%DBUSER%%/${db_user}/g" ${libdir}/${db_prefix}-user-count.sql > "$sql"
+    local users_found=$($db_bin_query < $sql)
+    if [ $users_found -eq 0 ]
     then
-        sed -e "s/%%DBUSER%%/${db_user}/g" ${libdir}/mysql-user-count.sql > "$sql"
-        local users_found=$(sudo mysql --skip-column-names < $sql)
-        if [ $users_found -eq 0 ]
-        then
-            db_create_user=1
-        fi
+        db_create_user=1
     fi
 
     # Test for existing database
     local create_db=0
-    sed -e "s/%%DBNAME%%/${db_name}/g" ${libdir}/mysql-db-count.sql > "$sql"
-    local db_found=$(sudo mysql --skip-column-names < $sql)
+    sed -e "s/%%DBNAME%%/${db_name}/g" ${libdir}/${db_prefix}-db-count.sql > "$sql"
+    local db_found=$($db_bin_query < $sql)
     if [ $db_found -eq 0 ]
     then
         create_db=1
@@ -61,54 +64,22 @@ function create_db_mysql() {
     if [ $db_create_user -eq 1 ]
     then
         echo "Creating Moodle database user."
-        sed -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBPASS%%/${db_pass}/g" ${libdir}/mysql-create-user.sql > "$sql"
-        sudo mysql < $sql
-    fi
-
-    if [ $create_db -eq 1 ]
-    then
-        echo "Creating empty Moodle database."
-        sed -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBNAME%%/${db_name}/g" ${libdir}/mysql-create-db.sql > "$sql"
-        sudo mysql < $sql
-    fi
-
-    rm "$sql"
-}
-
-function create_db_postgres() {
-    local sql="/tmp/user.sql"
-    # Test for existing user
-    if [ $db_create_user -eq 0 ]
-    then
-        sed -e "s/%%DBUSER%%/${db_user}/g" ${libdir}/psql-user-count.sql > "$sql"
-        local users_found=$(sudo sudo -u postgres psql --tuples-only --no-align < $sql)
-        if [ $users_found -eq 0 ]
+        sed -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBPASS%%/${db_pass}/g" ${libdir}/${db_prefix}-create-user.sql > "$sql"
+        $db_bin < $sql
+    else
+        if [ $db_update_password -eq 1 ]
         then
-            db_create_user=1
+            echo "Setting new password for Moodle database user."
+            sed -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBPASS%%/${db_pass}/g" ${libdir}/${db_prefix}-alter-user.sql > "$sql"
+            $db_bin < $sql
         fi
     fi
 
-    # Test for existing database
-    local create_db=0
-    sed -e "s/%%DBNAME%%/${db_name}/g" ${libdir}/psql-db-count.sql > "$sql"
-    local db_found=$(sudo sudo -u postgres psql --tuples-only --no-align < $sql)
-    if [ $db_found -eq 0 ]
-    then
-        create_db=1
-    fi
-
-    if [ $db_create_user -eq 1 ]
-    then
-        echo "Creating Moodle database user."
-        sed -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBPASS%%/${db_pass}/g" ${libdir}/psql-create-user.sql > "$sql"
-        sudo sudo -u postgres psql < $sql
-    fi
-
     if [ $create_db -eq 1 ]
     then
         echo "Creating empty Moodle database."
-        sed -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBNAME%%/${db_name}/g" ${libdir}/psql-create-db.sql > "$sql"
-        sudo sudo -u postgres psql < $sql
+        sed -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBNAME%%/${db_name}/g" ${libdir}/${db_prefix}-create-db.sql > "$sql"
+        $db_bin < $sql
     fi
 
     rm "$sql"
