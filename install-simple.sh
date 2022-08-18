@@ -69,3 +69,4 @@ create_db
 
 install_apache
 install_php
+install_moodle

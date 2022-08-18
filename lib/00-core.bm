@@ -1,6 +1,8 @@
 # Additional global variables
 cwd="$(pwd)"
 iomad_dir="${web_dir}/iomad"
+# From https://stackoverflow.com/questions/21336126/linux-bash-script-to-extract-ip-address
+ip_addr=$(ip route get 1.1.1.1 | sed 's/.*src \([^ ]*\).*/\1/;t;d')
 moodle_tarball="${moodle_src_dir}/moodle.tgz"
 
 function create_data_directories() {

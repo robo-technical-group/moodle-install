@@ -1,3 +1,36 @@
+function install_moodle() {
+    echo "Creating Moodle configuration file."
+    local cfg="${web_dir}/current/config.php"
+    sed -e "s/%%MOODLEFILES%%/${moodle_files_dir}/g" -e "s/%%IPADDR%%/${ip_addr}/g" ${libdir}/moodle-config-header.php > "$cfg"
+    local cfg_suffix="none"
+    case "$db_type" in
+        mariadb)
+            cfg_suffix="mariadb"
+            ;;
+
+        mysql)
+            cfg_suffix="mysql"
+            ;;
+
+        postgres|psql)
+            cfg_suffix="postgres"
+            ;;
+    esac
+    sed -e "s/%%DBHOST%%/${db_host}/g" -e "s/%%DBNAME%%/${db_name}/g" -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBPASS%%/${db_pass}/g" ${libdir}/moodle-config-${cfg_suffix}.PHP >> "$cfg"
+    cat ${libdir}/moodle-config-footer.php >> "$cfg"
+
+    echo "Building Moodle database."
+    sudo sudo -u www-data \
+        /usr/bin/php admin/cli/install_database.php \
+        --lang=en-us
+        --agree-license \
+        --adminuser=${moodle_admin_user} \
+        --adminpass=${moodle_admin_pw} \
+        --adminemail=${moodle_admin_email} \
+        --fullname=${moodle_sitename} \
+        --shortname=${moodle_sitename}
+}
+
 function install_php() {
     # Enable Ondřej Surý’s repositories for the current version of PHP.
     echo "Enabling PHP repositories."
