@@ -70,3 +70,5 @@ create_db
 install_apache
 install_php
 install_moodle
+
+echo "Moodle is ready at http://${ip_addr}"

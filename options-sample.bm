@@ -1,0 +1,42 @@
+## Configuration
+# Show debug messages
+DEBUG=1
+
+# Database information
+# Database host
+db_host=localhost
+# Database name
+db_name=moodle
+# Password for database user
+# Leave blank to autogenerate a complex password
+db_pass=
+# Database type: mariadb, mysql, or postgres
+db_type=mariadb
+# Database user
+db_user=moodle
+# Git branch for Iomad installation
+iomad_branch=IOMAD_400_STABLE
+# Moodle admin e-mail address
+moodle_admin_email=admin@no.email
+# Moodle admin username
+moodle_admin_user=rqo23.8fr
+# Moodle admin password
+moodle_admin_pw=usuCRMmSEHRm@tPuQh4S
+# Moodle data files location
+moodle_files_dir=/var/opt/moodle
+# Moodle site name (for installation)
+moodle_sitename=Moodle
+# Location of Moodle source tarballs
+moodle_src_dir=/usr/local/src/moodle
+# Installation type: moodle or iomad
+moodle_type=moodle
+# Moodle version number to install
+moodle_ver=4.0
+# PHP version to install
+php_ver=7.4
+# Location of web files
+web_dir=/opt/moodle/php
+
+# Binaries
+git=$(which git)
+wget=$(which wget)
