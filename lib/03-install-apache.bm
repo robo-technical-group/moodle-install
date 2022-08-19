@@ -3,7 +3,7 @@ function install_apache() {
     sudo apt-get install -y apache2
     echo "Creating apache configuration."
     local apache_conf="/etc/apache2/sites-available/moodle.conf"
-    sed -e "s/%%WEBDIR%%/${web_dir//\//\\\/}/g" ${libdir}/apache-vhost.conf > "$apache_conf"
+    sed -e "s/%%WEBDIR%%/${web_dir//\//\\\/}/g" ${libdir}/apache-vhost.conf | sudo tee "$apache_conf"
     sudo adduser www-data moodle
     sudo a2enmod rewrite
     sudo a2ensite moodle
