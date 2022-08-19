@@ -33,6 +33,8 @@ function install_moodle() {
         --adminemail=${moodle_admin_email} \
         --fullname=${moodle_sitename} \
         --shortname=${moodle_sitename}
+
+    sudo service apache2 restart > /dev/null
 }
 
 function install_php() {
