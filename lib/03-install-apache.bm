@@ -1,6 +1,6 @@
 function install_apache() {
     echo "Installing apache2."
-    sudo apt-get install apache2
+    sudo apt-get install -y apache2
     echo "Creating apache configuration."
     local apache_conf="/etc/apache2/sites-available/moodle.conf"
     sed -e "s/%%WEBDIR%%/${web_dir}/g" ${libdir}/apache-vhost.conf > "$apache_conf"

@@ -29,8 +29,8 @@ function create_data_directories() {
 
 function prep_debian() {
     echo "Installing software updates."
-    sudo apt-get update
-    sudo apt-get dist-upgrade
+    sudo apt-get -y update
+    sudo apt-get -y dist-upgrade
 
     # Check for `moodle` group
     getent group moodle > /dev/null
