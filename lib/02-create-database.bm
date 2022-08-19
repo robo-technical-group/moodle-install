@@ -93,7 +93,7 @@ function install_mariadb() {
     else
         echo "Installing MariaDB server."
         sudo apt-get install -y mariadb-client mariadb-server
-        cp ${libdir}/mysql.cnf /etc/mysql/conf.d/moodle.cnf
+        sudo cp ${libdir}/mysql.cnf /etc/mysql/conf.d/moodle.cnf
     fi
 }
 
@@ -110,7 +110,7 @@ function install_mysql() {
         rm mysql-apt-config*
         sudo apt-get update
         sudo apt-get install -y mysql-client mysql-server
-        cp ${libdir}/mysql.cnf /etc/mysql/conf.d/moodle.cnf
+        sudo cp ${libdir}/mysql.cnf /etc/mysql/conf.d/moodle.cnf
     fi
 }
 
