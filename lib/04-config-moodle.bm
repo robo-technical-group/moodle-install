@@ -16,13 +16,14 @@ function install_moodle() {
             cfg_suffix="postgres"
             ;;
     esac
-    sed -e "s/%%DBHOST%%/${db_host}/g" -e "s/%%DBNAME%%/${db_name}/g" -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBPASS%%/${db_pass}/g" ${libdir}/moodle-config-${cfg_suffix}.PHP >> "$cfg"
+    sed -e "s/%%DBHOST%%/${db_host}/g" -e "s/%%DBNAME%%/${db_name}/g" -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBPASS%%/${db_pass}/g" ${libdir}/moodle-config-${cfg_suffix}.php >> "$cfg"
     cat ${libdir}/moodle-config-footer.php >> "$cfg"
 
     echo "Building Moodle database."
+    cd ${web_dir}/current
     sudo sudo -u www-data \
         /usr/bin/php admin/cli/install_database.php \
-        --lang=en-us
+        --lang=en-us \
         --agree-license \
         --adminuser=${moodle_admin_user} \
         --adminpass=${moodle_admin_pw} \
@@ -45,5 +46,5 @@ function install_php() {
         php${php_ver}-intl php${php_ver}-json php${php_ver}-opcache php${php_ver}-zip php${php_ver}-curl \
         ghostscript sendmail-cf aspell-en unzip
 
-    cp ${libdir}/php.ini /etc/php/${php_ver}/mods-available/moodle.ini
+    sudo cp ${libdir}/php.ini /etc/php/${php_ver}/mods-available/moodle.ini
 }
