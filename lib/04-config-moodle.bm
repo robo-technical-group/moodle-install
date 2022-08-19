@@ -21,6 +21,9 @@ function install_moodle() {
 
     echo "Updating permissions on Moodle data files location."
     sudo chgrp moodle "$moodle_files_dir"
+
+    echo "Updating permissions on Moodle web files."
+    sudo chgrp moodle "${web_dir}/current/*"
     
     echo "Building Moodle database."
     cd ${web_dir}/current
