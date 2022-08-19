@@ -19,6 +19,9 @@ function install_moodle() {
     sed -e "s/%%DBHOST%%/${db_host}/g" -e "s/%%DBNAME%%/${db_name}/g" -e "s/%%DBUSER%%/${db_user}/g" -e "s/%%DBPASS%%/${db_pass}/g" ${libdir}/moodle-config-${cfg_suffix}.php >> "$cfg"
     cat ${libdir}/moodle-config-footer.php >> "$cfg"
 
+    echo "Updating permissions on Moodle data files location."
+    sudo chgrp moodle "$moodle_files_dir"
+    
     echo "Building Moodle database."
     cd ${web_dir}/current
     sudo sudo -u www-data \
