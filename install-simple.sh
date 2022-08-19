@@ -71,6 +71,5 @@ install_apache
 install_php
 install_moodle
 
-echo "Moodle is ready at http://localhost"
-echo "Edit ${web_dir}/current/config.php to change web site address."
+echo "Moodle is ready at http://${ip_addr}"
 cd "$cwd"
