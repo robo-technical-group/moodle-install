@@ -38,18 +38,32 @@ function install_moodle() {
 function install_php() {
     # Enable Ondřej Surý’s repositories for the current version of PHP.
     echo "Enabling PHP repositories."
-    sudo apt-get install -y apt-transport-https lsb-release ca-certificates
     sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
     echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
-    sudo apt-get update
-    sudo apt-get dist-upgrade -y
+    if [ $DEBUG -eq 1 ]
+    then
+        sudo apt-get update
+        sudo apt-get dist-upgrade -y
 
-    echo "Installing PHP libraries."
-    sudo apt-get install -y php${php_ver} php${php_ver}-mysql php${php_ver}-pgsql \
-        php${php_ver}-mbstring php${php_ver}-xmlrpc php${php_ver}-soap php${php_ver}-gd php${php_ver}-xml \
-        php${php_ver}-intl php${php_ver}-json php${php_ver}-opcache php${php_ver}-zip php${php_ver}-curl \
-        ghostscript sendmail-cf aspell-en unzip
+        echo "Installing PHP libraries."
+        sudo apt-get install -y php${php_ver} php${php_ver}-mysql php${php_ver}-pgsql \
+            php${php_ver}-mbstring php${php_ver}-xmlrpc php${php_ver}-soap php${php_ver}-gd php${php_ver}-xml \
+            php${php_ver}-intl php${php_ver}-json php${php_ver}-opcache php${php_ver}-zip php${php_ver}-curl \
+            ghostscript sendmail-cf aspell-en unzip
 
-    sudo cp ${libdir}/php.ini /etc/php/${php_ver}/mods-available/moodle.ini
-    sudo phpenmod moodle
+        sudo cp ${libdir}/php.ini /etc/php/${php_ver}/mods-available/moodle.ini
+        sudo phpenmod moodle
+    else
+        sudo apt-get update > /dev/null
+        sudo apt-get dist-upgrade -y > /dev/null
+
+        echo "Installing PHP libraries."
+        sudo apt-get install -y php${php_ver} php${php_ver}-mysql php${php_ver}-pgsql \
+            php${php_ver}-mbstring php${php_ver}-xmlrpc php${php_ver}-soap php${php_ver}-gd php${php_ver}-xml \
+            php${php_ver}-intl php${php_ver}-json php${php_ver}-opcache php${php_ver}-zip php${php_ver}-curl \
+            ghostscript sendmail-cf aspell-en unzip > /dev/null
+
+        sudo cp ${libdir}/php.ini /etc/php/${php_ver}/mods-available/moodle.ini
+        sudo phpenmod moodle > /dev/null
+    fi
 }

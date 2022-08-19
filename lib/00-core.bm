@@ -29,8 +29,16 @@ function create_data_directories() {
 
 function prep_debian() {
     echo "Installing software updates."
-    sudo apt-get -y update
-    sudo apt-get -y dist-upgrade
+    if [ $DEBUG -eq 1 ]
+    then
+        sudo apt-get -y update
+        sudo apt-get -y dist-upgrade
+        sudo apt-get install -y apt-transport-https lsb-release ca-certificates
+    else
+        sudo apt-get -y update > /dev/null
+        sudo apt-get -y dist-upgrade > /dev/null
+        sudo apt-get install -y apt-transport-https lsb-release ca-certificates > /dev/null
+    fi
 
     # Check for `moodle` group
     getent group moodle > /dev/null

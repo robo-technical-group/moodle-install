@@ -73,3 +73,4 @@ install_moodle
 
 echo "Moodle is ready at http://${ip_addr}"
 cd "$cwd"
+exit 0

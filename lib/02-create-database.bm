@@ -92,7 +92,12 @@ function install_mariadb() {
         print_verbose "MariaDB server is installed."
     else
         echo "Installing MariaDB server."
-        sudo apt-get install -y mariadb-client mariadb-server
+        if [ $DEBUG -eq 1 ]
+        then
+            sudo apt-get install -y mariadb-client mariadb-server
+        else
+            sudo apt-get install -y mariadb-client mariadb-server > /dev/null
+        fi
         sudo cp ${libdir}/mysql.cnf /etc/mysql/conf.d/moodle.cnf
     fi
 }
@@ -106,10 +111,18 @@ function install_mysql() {
         echo "Installing MySQL server."
         cd /tmp
         wget https://dev.mysql.com/get/mysql-apt-config_0.8.22-1_all.deb
-        sudo dpkg -i mysql-apt-config*
-        rm mysql-apt-config*
-        sudo apt-get update
-        sudo apt-get install -y mysql-client mysql-server
+        if [ $DEBUG -eq 1 ]
+        then
+            sudo dpkg -i mysql-apt-config*
+            rm mysql-apt-config*
+            sudo apt-get update
+            sudo apt-get install -y mysql-client mysql-server
+        else
+            sudo dpkg -i mysql-apt-config* > /dev/null
+            rm mysql-apt-config*
+            sudo apt-get update > /dev/null
+            sudo apt-get install -y mysql-client mysql-server > /dev/null
+        fi
         sudo cp ${libdir}/mysql.cnf /etc/mysql/conf.d/moodle.cnf
     fi
 }
@@ -133,6 +146,11 @@ function install_postgres() {
         print_verbose "PostgreSQL server is installed."
     else
         echo "Installing PostgreSQL server."
-        sudo apt-get install -y postgresql postgresql-client
+        if [ $DEBUG -eq 1 ]
+        then
+            sudo apt-get install -y postgresql postgresql-client
+        else
+            sudo apt-get install -y postgresql postgresql-client > /dev/null
+        fi
     fi
 }
