@@ -47,4 +47,5 @@ function install_php() {
         ghostscript sendmail-cf aspell-en unzip
 
     sudo cp ${libdir}/php.ini /etc/php/${php_ver}/mods-available/moodle.ini
+    sudo phpenmod moodle
 }
