@@ -19,9 +19,9 @@ iomad_branch=IOMAD_400_STABLE
 # Moodle admin e-mail address
 moodle_admin_email=admin@no.email
 # Moodle admin username
-moodle_admin_user=rqo23.8fr
+moodle_admin_user=none
 # Moodle admin password
-moodle_admin_pw=usuCRMmSEHRm@tPuQh4S
+moodle_admin_pw=none
 # Moodle data files location
 moodle_files_dir=/var/opt/moodle
 # Moodle site name (for installation)
