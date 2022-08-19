@@ -1,7 +1,7 @@
 function install_moodle() {
     echo "Creating Moodle configuration file."
     local cfg="${web_dir}/current/config.php"
-    sed -e "s/%%MOODLEFILES%%/${moodle_files_dir}/g" -e "s/%%IPADDR%%/${ip_addr}/g" ${libdir}/moodle-config-header.php > "$cfg"
+    sed -e "s/%%MOODLEFILES%%/${moodle_files_dir}/g" -e "s/%%IPADDR%%/${ip_addr//\./\\\.}/g" ${libdir}/moodle-config-header.php > "$cfg"
     local cfg_suffix="none"
     case "$db_type" in
         mariadb)
