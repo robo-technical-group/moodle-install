@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 ######################################################################
-# install-simple.sh
-# Create a simple Moodle install from scratch.
-# Great for quick dev builds on a local machine.
-# Installs Moodle or Iomad; designed for use with a localhost db.
+# upgrade-moodle.sh
+# Upgrades an existing Moodle install.
 ######################################################################
 # CHANGE LOG
 ######################################################################
 # Date        Author   Comment
-# 19 Aug 2022 akulcsar Initial release
+# 20 Aug 2022 akulcsar Initial release
 ######################################################################
 
 # Get our bearings; learn about the environment.
@@ -29,6 +27,16 @@ then
 fi
 . ${xdir}/options.bm
 
+# Verify configuration
+if [ -z "$web_dir" -o ! -d "${web_dir}" -o ! -L "${web_dir}/current" ]
+then
+    echo "Verify your 'options.bm' file."
+    echo "Either web directory '$web_dir' does not exist"
+    echo "  or it does not contain a symlink called 'current' that"
+    echo "  points to the version of Moodle running on your web server."
+    exit 1
+fi
+
 # Load bash modules in the lib directory.
 for bm in $( ls "${libdir}"/*.bm ) ;
 do
@@ -47,40 +55,12 @@ then
     print_vars
 fi
 
-retval=0
-prep_debian
-create_data_directories
+get_moodle_src
 retval=$?
 if [ $retval -gt 0 ]
 then
     exit $retval
 fi
-
-if [ $moodle_type == "moodle" ]
-then
-    get_moodle_src
-    retval=$?
-    if [ $retval -eq 0 ]
-    then
-        extract_moodle_src
-        retval=$?
-    fi
-else
-    get_iomad_src
-    retval=$?
-fi
-if [ $retval -gt 0 ]
-then
-    cd "$cwd"
-    exit $retval
-fi
-
-# Will only run when database server is localhost
-create_db
-
-install_apache
-install_php
-install_moodle
 
 echo "Moodle is ready at http://${ip_addr}"
 cd "$cwd"

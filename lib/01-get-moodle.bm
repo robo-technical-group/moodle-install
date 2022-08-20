@@ -59,6 +59,7 @@ function get_moodle_src() {
 
     # Only download tarball if a current one does not exist.
     local uri="https://download.moodle.org/download.php/direct/stable${moodle_full_version[0]}${moodle_full_version[1]}/moodle-latest-${moodle_full_version[0]}${moodle_full_version[1]}.tgz"
+    moodle_tarball="${moodle_src_dir}/moodle.tgz"
     if [ ! -e $moodle_tarball ]
     then
         print_verbose "Downloading $uri to $moodle_src_dir"
