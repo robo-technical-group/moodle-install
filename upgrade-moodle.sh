@@ -55,11 +55,13 @@ then
     print_vars
 fi
 
-get_moodle_src
+compare_moodle_versions
 retval=$?
 if [ $retval -gt 0 ]
 then
     exit $retval
+else
+    upgrade_moodle
 fi
 
 echo "Moodle is ready at http://${ip_addr}"

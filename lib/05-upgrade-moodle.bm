@@ -1,0 +1,82 @@
+# Retrieves the version of Moodle requested in options.bm and compares
+# it against the version currently running.
+# Returns:
+#   0 = Versions are different
+#   Non-zero = Versions are the same or other error
+function compare_moodle_versions() {
+    get_moodle_src
+    local retval=$?
+    if [ $retval -gt 0 ]
+    then
+        return $retval
+    fi
+
+    moodle_version_dl=$moodle_version_string
+    moodle_full_version_dl=()
+    for i in {0..3} ;
+    do
+        moodle_full_version_dl[$i]=$moodle_full_version[$i]
+    done
+
+    get_moodle_version "${web_dir}/current"
+    moodle_version_current=$moodle_version_string
+    moodle_full_version_curr=()
+    for i in {0..3} ;
+    do
+        moodle_full_version_curr[$i]=$moodle_full_version[$i]
+    done
+
+    retval=1
+    for i in {0..3}
+    do
+        if [ $moodle_full_version_curr[$i] -ne $moodle_full_version_dl[$i] ]
+        then
+            retval=0
+        fi
+    done
+
+    if [ $retval = 0 ]
+    then
+        echo "Moodle versions are different."
+    else
+        echo "Moodle versions are the same."
+    fi
+    return $retval
+}
+
+function upgrade_moodle() {
+    # Reset Moodle version information to current download
+    moodle_version_string=$moodle_version_dl
+    for i in {0..3} ;
+    do
+        moodle_full_version[$i]=$moodle_full_version_dl[$i]
+    done
+
+    local moodle_php_curr=$(readlink -f "${web_dir}/current")
+    extract_moodle_src
+    local moodle_php_new=$(readlink -f "${web_dir}/current")
+
+    # Copy extensions that do not exist in new Moodle directory
+    for ver_file in $(find "$moodle_php_curr" -name version.php) ;
+    do
+        local ver_file_rel=${ver_file:curr_path_length}
+        ver_file_rel=${ver_file_rel:1}
+        local ext_rel_path=$(dirname $ver_file_rel)
+        local ext_rel_loc=$(dirname $ext_rel_path)
+        if [ ! -d "${moodle_php_new}/$ext_rel_path" ]
+        then
+            echo "Copying extension at $ext_rel_path"
+            mkdir -p "${moodle_php_new}/$ext_rel_path"
+            cp -a "${moodle_php_curr}/$ext_rel_path/"* "${moodle_php_new}/$ext_rel_path/"
+            sudo chgrp moodle "${moodle_php_curr}/$ext_rel_loc"
+            sudo chmod g+ws "${moodle_php_curr}/$ext_rel_loc"
+            sudo chgrp -R moodle "${moodle_php_curr}/$ext_rel_path"
+            sudo chmod -R g+ws "${moodle_php_curr}/$ext_rel_path"
+        fi
+    done
+
+    # Run upgrade
+    echo "Running upgrade script."
+    cd "${web_dir}/current"
+    sudo sudo -u www-data /usr/bin/php admin/cli/upgrade.php
+}
