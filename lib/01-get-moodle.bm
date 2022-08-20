@@ -67,14 +67,14 @@ function get_moodle_src() {
     fi
     cd $moodle_src_dir
     tar xfz moodle.tgz moodle/version.php
-    rev=$(grep "^\$version" moodle/version.php | sed -n "s/^\$version[[:blank:]]*=[[:blank:]]*[[:digit:]]\{8\}\(.*\);.*/\1/p")
-    moodle_full_version[2]=${rev%%.*}
-    moodle_full_version[3]=${rev#*.}
-    rm -rf moodle
-
-    printf -v moodle_version_string '%s.' "${moodle_full_version[@]}"
-    moodle_version_string=${moodle_version_string%.}
+    get_moodle_version "${moodle_src_dir}/moodle/version.php"
+    retval=$?
     print_verbose "Moodle version downloaded: $moodle_version_string"
+    rm -rf moodle
+    if [ $retval -gt 0 ]
+    then
+        return $retval
+    fi
 
     local new_moodle_file=moodle-${moodle_version_string}.tgz
     if [ ! -e $new_moodle_file ]
@@ -84,6 +84,26 @@ function get_moodle_src() {
         rm moodle.tgz
     fi
     moodle_tarball=${moodle_src_dir}/${new_moodle_file}
+}
+
+function get_moodle_version() {
+    local src_dir="$1"
+    local ver_file="${1}/version.php"
+    if [ ! -e "$ver_file" ]
+    then
+        echo "Could not find Moodle version file ${ver_file}; aborting."
+        return 1
+    fi
+
+    local branch=$(grep "^\$branch" "$ver_file" | sed -n "s/^\$branch[[:blank:]]*=[[:blank:]]*'\([[:digit:]]*\)';.*/\1/p")
+    moodle_full_version[0]=${branch:0:1}
+    moodle_full_version[1]=${branch:1}
+    local rev=$(grep "^\$version" "$ver_file" | sed -n "s/^\$version[[:blank:]]*=[[:blank:]]*[[:digit:]]\{8\}\(.*\);.*/\1/p")
+    moodle_full_version[2]=${rev%%.*}
+    moodle_full_version[3]=${rev#*.}
+    
+    printf -v moodle_version_string '%s.' "${moodle_full_version[@]}"
+    moodle_version_string=${moodle_version_string%.}
 }
 
 function split_version_string() {
