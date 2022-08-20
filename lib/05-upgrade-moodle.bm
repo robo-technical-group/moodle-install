@@ -37,9 +37,9 @@ function compare_moodle_versions() {
 
     if [ $retval = 0 ]
     then
-        echo "Moodle versions are different."
+        echo "Moodle versions are different; upgrade from $moodle_version_current to ${moodle_version_dl}."
     else
-        echo "Moodle versions are the same."
+        echo "Moodle versions are the same: ${moodle_version_dl}."
     fi
     return $retval
 }
