@@ -63,7 +63,7 @@ function upgrade_moodle() {
     else
         echo "WARNING: Could not find config.php in ${moodle_php_curr}"
     fi
-    
+
     # Copy extensions that do not exist in new Moodle directory
     for ver_file in $(find "$moodle_php_curr" -name version.php) ;
     do
@@ -76,10 +76,10 @@ function upgrade_moodle() {
             echo "Copying extension at $ext_rel_path"
             mkdir -p "${moodle_php_new}/$ext_rel_path"
             cp -a "${moodle_php_curr}/$ext_rel_path/"* "${moodle_php_new}/$ext_rel_path/"
-            sudo chgrp moodle "${moodle_php_curr}/$ext_rel_loc"
-            sudo chmod g+ws "${moodle_php_curr}/$ext_rel_loc"
-            sudo chgrp -R moodle "${moodle_php_curr}/$ext_rel_path"
-            sudo chmod -R g+ws "${moodle_php_curr}/$ext_rel_path"
+            sudo chgrp moodle "${moodle_php_new}/$ext_rel_loc"
+            sudo chmod g+ws "${moodle_php_new}/$ext_rel_loc"
+            sudo chgrp -R moodle "${moodle_php_new}/$ext_rel_path"
+            sudo chmod -R g+ws "${moodle_php_new}/$ext_rel_path"
         fi
     done
 
