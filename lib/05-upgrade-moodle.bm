@@ -15,7 +15,7 @@ function compare_moodle_versions() {
     moodle_full_version_dl=()
     for i in {0..3} ;
     do
-        moodle_full_version_dl[$i]=$moodle_full_version[$i]
+        moodle_full_version_dl[$i]=${moodle_full_version[$i]}
     done
 
     get_moodle_version "${web_dir}/current"
@@ -23,13 +23,13 @@ function compare_moodle_versions() {
     moodle_full_version_curr=()
     for i in {0..3} ;
     do
-        moodle_full_version_curr[$i]=$moodle_full_version[$i]
+        moodle_full_version_curr[$i]=${moodle_full_version[$i]}
     done
 
     retval=1
     for i in {0..3}
     do
-        if [ $moodle_full_version_curr[$i] -ne $moodle_full_version_dl[$i] ]
+        if [ ${moodle_full_version_curr[$i]} -ne ${moodle_full_version_dl[$i]} ]
         then
             retval=0
         fi
