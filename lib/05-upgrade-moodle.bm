@@ -56,6 +56,14 @@ function upgrade_moodle() {
     local curr_path_length=${#moodle_php_curr}
     extract_moodle_src
     local moodle_php_new=$(readlink -f "${web_dir}/current")
+    
+    if [ -e "${moodle_php_curr}/config.php" ]
+    then
+        cp "${moodle_php_curr}/config.php" "${moodle_php_new}/"
+    else
+        echo "WARNING: Could not find config.php in ${moodle_php_curr}"
+    fi
+    
     # Copy extensions that do not exist in new Moodle directory
     for ver_file in $(find "$moodle_php_curr" -name version.php) ;
     do
