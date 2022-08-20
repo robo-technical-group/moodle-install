@@ -53,9 +53,9 @@ function upgrade_moodle() {
     done
 
     local moodle_php_curr=$(readlink -f "${web_dir}/current")
+    local curr_path_length=${#moodle_php_curr}
     extract_moodle_src
     local moodle_php_new=$(readlink -f "${web_dir}/current")
-
     # Copy extensions that do not exist in new Moodle directory
     for ver_file in $(find "$moodle_php_curr" -name version.php) ;
     do
