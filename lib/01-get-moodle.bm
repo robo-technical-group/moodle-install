@@ -67,7 +67,7 @@ function get_moodle_src() {
     fi
     cd $moodle_src_dir
     tar xfz moodle.tgz moodle/version.php
-    get_moodle_version "${moodle_src_dir}/moodle/version.php"
+    get_moodle_version "${moodle_src_dir}/moodle"
     retval=$?
     print_verbose "Moodle version downloaded: $moodle_version_string"
     rm -rf moodle
