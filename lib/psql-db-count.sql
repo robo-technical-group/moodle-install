@@ -1,3 +1,3 @@
 SELECT COUNT(*)
-FROM pg_tables
-WHERE schemaname = '%%DBNAME%%';
+FROM pg_database
+WHERE datname = '%%DBNAME%%';
