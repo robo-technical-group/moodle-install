@@ -1,6 +1,7 @@
 function create_db() {
     local db_bin="null"
     local db_bin_query="null"
+    local db_create_user=0
     local db_prefix="null"
     local db_update_password=0
 
